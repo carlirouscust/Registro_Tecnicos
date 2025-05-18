@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.devtools.ksp")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -63,7 +64,8 @@ dependencies {
 
     //navegacion
     implementation("androidx.navigation:navigation-compose:2.8.0-rc01")
-    implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlinx.serialization.json)
+
 
     //room
     implementation("androidx.room:room-runtime:2.6.1")
