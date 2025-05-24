@@ -59,14 +59,9 @@ fun TecnicosNavHost(
             val tecnicoList = tecnicoViewModel.tecnicoList.collectAsState().value
 
             TicketListScreen(
+                navController = navHostController, // <- Este es el parámetro nuevo
                 ticketList = ticketList,
                 tecnicos = tecnicoList,
-                onEdit = { ticket ->
-                    navHostController.navigate("Ticket/${ticket.ticketId}")
-                },
-                onCreate = {
-                    navHostController.navigate("Ticket/null")
-                },
                 onDelete = { ticket ->
                     ticketViewModel.delete(ticket)
                 }
