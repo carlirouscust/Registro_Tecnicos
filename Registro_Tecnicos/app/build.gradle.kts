@@ -60,6 +60,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
 
+    //icons
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
+
+    implementation("androidx.compose.ui:ui:1.6.0")  // o versión más reciente
+    implementation("androidx.compose.ui:ui-tooling:1.6.0")
+
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
 
     //navegacion
