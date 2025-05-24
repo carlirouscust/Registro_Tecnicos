@@ -10,8 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class TicketResponseViewModel(
     private val repository: TicketResponseRepository
