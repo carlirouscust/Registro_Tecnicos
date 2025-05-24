@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -32,21 +33,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.ChatBubble
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.navigation.NavController
 import edu.ucne.registro_tecnicos.data.local.entities.TecnicosEntity
 import edu.ucne.registro_tecnicos.data.local.entities.TicketsEntity
 
 @Composable
 fun TicketListScreen(
+    navController: NavController,
     ticketList: List<TicketsEntity>,
     tecnicos: List<TecnicosEntity>,
-    onCreate: () -> Unit,
     onDelete: (TicketsEntity) -> Unit,
-    onEdit: (TicketsEntity) -> Unit
+    onComment: (TicketsEntity) -> Unit
 ) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onCreate,
+                onClick = { navController.navigate("Ticket/null") },
                 containerColor = Color(0xFF4CAF50),
                 contentColor = Color.White
             ) {
@@ -54,7 +58,6 @@ fun TicketListScreen(
             }
         }
     ) { paddingValues ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -77,19 +80,32 @@ fun TicketListScreen(
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(18.dp)) {
                 items(ticketList) { ticket ->
-                    TicketRow(ticket, tecnicos, onDelete, onEdit)
+                    TicketRow(
+                        ticket = ticket,
+                        tecnicos = tecnicos,
+                        onDelete = onDelete,
+                        onEdit = { selectedTicket ->
+                            navController.navigate("Ticket/${selectedTicket.ticketId}")
+                        },
+                        onComment = { selectedTicket ->
+                            navController.navigate("TicketResponse/${selectedTicket.ticketId}")
+                        }
+                    )
+
                 }
             }
         }
     }
 }
 
+
 @Composable
 fun TicketRow(
     ticket: TicketsEntity,
     tecnicos: List<TecnicosEntity>,
     onDelete: (TicketsEntity) -> Unit,
-    onEdit: (TicketsEntity) -> Unit
+    onEdit: (TicketsEntity) -> Unit,
+    onComment: (TicketsEntity) -> Unit
 ) {
     val prioridadTexto = when (ticket.prioridadId) {
         1 -> "Baja"
@@ -98,85 +114,75 @@ fun TicketRow(
         else -> "Desconocida"
     }
 
-    val tecnicoNombre = tecnicos.find { tecnico -> tecnico.tecnicosId == ticket.tecnicoId }?.nombre ?: "Desconocido"
+    val tecnicoNombre = tecnicos.find { it.tecnicosId == ticket.tecnicoId }?.nombre ?: "Desconocido"
 
     Card(
-        elevation = CardDefaults.cardElevation(14.dp),
-        modifier = Modifier.fillMaxWidth()
+        elevation = CardDefaults.cardElevation(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
     ) {
         Row(
             modifier = Modifier
-                .padding(22.dp)
+                .padding(16.dp)
                 .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Fecha: ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = ticket.fecha, fontSize = 16.sp)
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Prioridad: ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = prioridadTexto, fontSize = 16.sp)
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Cliente: ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = ticket.cliente, fontSize = 16.sp)
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Asunto: ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = ticket.asunto, fontSize = 16.sp)
-                }
+            Column(modifier = Modifier.weight(1f)) {
+                InfoRow(label = "Fecha:", value = ticket.fecha)
+                InfoRow(label = "Prioridad:", value = prioridadTexto)
+                InfoRow(label = "Cliente:", value = ticket.cliente)
+                InfoRow(label = "Asunto:", value = ticket.asunto)
+
+                // Descripción mejorada
                 Row(verticalAlignment = Alignment.Top) {
+                    Text("Descripción:", fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.width(4.dp))
                     Text(
-                        text = "Descripcion: ",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        text = ticket.descripcion.replace("\n", " "),
+                        modifier = Modifier.weight(1f),
+                        softWrap = true,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
                     )
-                    Text(
-                        text = ticket.descripcion,
-                        fontSize = 16.sp,
-                        modifier = Modifier
-                            .padding(top = 2.dp)
-                            .weight(1f),
-                        softWrap = true
-                    )
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Técnico: ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Text(text = tecnicoNombre, fontSize = 16.sp)
                 }
 
+                InfoRow(label = "Técnico:", value = tecnicoNombre)
             }
 
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                IconButton(
-                    onClick = { onEdit(ticket) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Edit,
-                        contentDescription = "Editar",
-                        tint = Color(0xFF4CAF50),
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
+            ActionButtons(
+                onComment = { onComment(ticket) },
+                onEdit = { onEdit(ticket) },
+                onDelete = { onDelete(ticket) }
+            )
+        }
+    }
+}
 
-                IconButton(
-                    onClick = { onDelete(ticket) },
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Delete,
-                        contentDescription = "Eliminar",
-                        tint = Color.Red,
-                        modifier = Modifier.size(28.dp)
-                    )
-                }
-            }
+@Composable
+private fun InfoRow(label: String, value: String) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(label, fontWeight = FontWeight.Bold)
+        Spacer(Modifier.width(4.dp))
+        Text(value)
+    }
+}
+
+@Composable
+private fun ActionButtons(
+    onComment: () -> Unit,
+    onEdit: () -> Unit,
+    onDelete: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.End) {
+        IconButton(onClick = onComment) {
+            Icon(Icons.Filled.ChatBubble, "Comentar", tint = Color(0xFF4CAF50))
+        }
+        IconButton(onClick = onEdit) {
+            Icon(Icons.Filled.Edit, "Editar", tint = Color(0xFF4CAF50))
+        }
+        IconButton(onClick = onDelete) {
+            Icon(Icons.Filled.Delete, "Eliminar", tint = Color.Red)
         }
     }
 }
