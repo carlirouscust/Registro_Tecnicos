@@ -14,6 +14,7 @@ import edu.ucne.registro_tecnicos.presentation.navigation.Screen
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketListScreen
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketScreen
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketViewModel
+import edu.ucne.registro_tecnicos.presentation.ticketresponse.TicketResponseScreen
 
 @Composable
 fun TecnicosNavHost(
@@ -59,12 +60,11 @@ fun TecnicosNavHost(
             val tecnicoList = tecnicoViewModel.tecnicoList.collectAsState().value
 
             TicketListScreen(
-                navController = navHostController, // <- Este es el parámetro nuevo
+                navController = navHostController,
                 ticketList = ticketList,
                 tecnicos = tecnicoList,
-                onDelete = { ticket ->
-                    ticketViewModel.delete(ticket)
-                }
+                onDelete = { ticket -> ticketViewModel.delete(ticket) },
+                onComment = { ticket -> navHostController.navigate("TicketResponse/${ticket.ticketId}")}
             )
         }
 
@@ -131,6 +131,20 @@ fun TecnicosNavHost(
                 onCancel = { navHostController.popBackStack() }
             )
 
+        }
+        composable("TicketResponse/{ticketId}") { backStackEntry ->
+            val ticketId = backStackEntry.arguments?.getString("ticketId")?.toIntOrNull()
+
+            TicketResponseScreen(
+                ticketId = ticketId ?: -1, // Maneja valores nulos
+                responses = emptyList(), // Reemplaza con tu fuente de datos real
+                nombreUsuario = "Usuario", // Ajusta según tu lógica
+                tipoUsuario = "Operador", // Ajusta según tu lógica
+                onMessageSend = { mensaje ->
+                    // Lógica para guardar el comentario
+                },
+                onBack = { navHostController.popBackStack() }
+            )
         }
 
     }
