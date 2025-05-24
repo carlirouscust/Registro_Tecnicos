@@ -59,6 +59,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    
 
     //icons
     implementation("androidx.compose.material:material-icons-extended:1.6.0")
@@ -77,6 +78,7 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")
     annotationProcessor("androidx.room:room-compiler:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
+
     //  optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.6.1")
 
