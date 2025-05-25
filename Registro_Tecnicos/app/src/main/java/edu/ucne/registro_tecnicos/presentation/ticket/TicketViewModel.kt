@@ -8,9 +8,11 @@ import kotlinx.coroutines.launch
 import edu.ucne.registro_tecnicos.data.local.entities.TicketsEntity
 import edu.ucne.registro_tecnicos.data.repository.TicketRepository
 import kotlinx.coroutines.flow.stateIn
+import edu.ucne.registro_tecnicos.data.repository.TicketResponseRepository
 
 class TicketViewModel(
-    private val repository: TicketRepository
+    private val repository: TicketRepository,
+    private val ticketResponseRepository: TicketResponseRepository
 ) : ViewModel() {
 
     val ticketList: StateFlow<List<TicketsEntity>> = repository.getAll()
