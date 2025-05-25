@@ -1,6 +1,7 @@
 package edu.ucne.registro_tecnicos.data.repository
 
 import edu.ucne.registro_tecnicos.data.local.database.TecnicosDb
+import edu.ucne.registro_tecnicos.data.local.entities.TicketResponseEntity
 import edu.ucne.registro_tecnicos.data.local.entities.TicketsEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
