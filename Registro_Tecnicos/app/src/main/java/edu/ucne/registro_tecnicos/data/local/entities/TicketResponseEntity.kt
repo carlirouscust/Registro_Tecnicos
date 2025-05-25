@@ -12,5 +12,5 @@ data class TicketResponseEntity(
     val nombre: String,
     val mensaje: String,
     val fecha: String,
-    val tipoUsuario: String // "Operador" o "Owner"
+    val tipoUsuario: String
 )
