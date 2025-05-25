@@ -1,12 +1,14 @@
 package edu.ucne.registro_tecnicos.presentation.ticketresponse
 
 import android.icu.text.SimpleDateFormat
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.material3.AlertDialogDefaults.containerColor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import edu.ucne.registro_tecnicos.data.local.entities.TicketResponseEntity
 import java.util.*
+import androidx.compose.material3.ButtonDefaults
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,12 +32,10 @@ fun TicketResponseScreen(
     var mensaje by remember { mutableStateOf("") }
     var tipoUsuario by remember { mutableStateOf("Usuario") }
 
-    // Actualiza el nombre según el tipo seleccionado y el ticket
     val nombreUsuario = remember(ticketId, tipoUsuario) {
         getNombrePorTipo(ticketId, tipoUsuario)
     }
 
-    // Cargar respuestas cuando cambie el ticketId
     LaunchedEffect(ticketId) { viewModel.loadResponses(ticketId) }
 
     Scaffold(
@@ -52,10 +53,10 @@ fun TicketResponseScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(Color.Gray)
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            // Lista de respuestas (más reciente arriba)
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
@@ -67,7 +68,7 @@ fun TicketResponseScreen(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = Color.White
+                            containerColor = Color.DarkGray
                         )
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
@@ -83,7 +84,7 @@ fun TicketResponseScreen(
                                 Text(
                                     text = respuesta.fecha,
                                     fontSize = 12.sp,
-                                    color = Color.Gray
+                                    color = Color.White
                                 )
                             }
                             Spacer(modifier = Modifier.height(4.dp))
@@ -104,63 +105,104 @@ fun TicketResponseScreen(
             }
 
             // Área para nueva respuesta
-            Column(
-                modifier = Modifier.padding(top = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.Black
+                )
             ) {
-                Text("Agregar respuesta", fontWeight = FontWeight.Bold)
-
-                // RadioButtons para tipo de usuario
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = tipoUsuario == "Usuario",
-                        onClick = { tipoUsuario = "Usuario" }
-                    )
-                    Text("Usuario")
-                    Spacer(Modifier.width(16.dp))
-                    RadioButton(
-                        selected = tipoUsuario == "Operador",
-                        onClick = { tipoUsuario = "Operador" }
-                    )
-                    Text("Operador")
-                }
-
-                OutlinedTextField(
-                    value = nombreUsuario,
-                    onValueChange = {},
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = false
-                )
-
-                OutlinedTextField(
-                    value = mensaje,
-                    onValueChange = { mensaje = it },
-                    label = { Text("Tu mensaje") },
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp), // Más alto para mensajes largos
-                    singleLine = false,
-                    maxLines = 6
-                )
-
-                Button(
-                    onClick = {
-                        if (mensaje.isNotBlank()) {
-                            viewModel.sendResponse(
-                                ticketId = ticketId,
-                                nombre = nombreUsuario,
-                                mensaje = mensaje,
-                                tipoUsuario = tipoUsuario
-                            )
-                            mensaje = ""
-                        }
-                    },
-                    modifier = Modifier.align(Alignment.End)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Enviar respuesta")
+                    Text("Agregar respuesta", fontWeight = FontWeight.Bold, color = Color.White)
+
+                    // RadioButtons para tipo de usuario
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        RadioButton(
+                            selected = tipoUsuario == "Usuario",
+                            onClick = { tipoUsuario = "Usuario" },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color.Green,
+                                unselectedColor = Color.White
+                            )
+                        )
+                        Text("Cliente", color = Color.White)
+                        Spacer(Modifier.width(16.dp))
+                        RadioButton(
+                            selected = tipoUsuario == "Operador",
+                            onClick = { tipoUsuario = "Operador" },
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = Color.Green,
+                                unselectedColor = Color.White
+                            )
+                        )
+                        Text("Tecnico", color = Color.White)
+                    }
+
+                    OutlinedTextField(
+                        value = nombreUsuario,
+                        onValueChange = {},
+                        label = { Text("Nombre", color = Color.White) },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = false,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            disabledTextColor = Color.White,
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            disabledBorderColor = Color.Gray,
+                            disabledLabelColor = Color.White,
+                            disabledPlaceholderColor = Color.Gray,
+                            focusedLabelColor = Color.White,
+                            unfocusedLabelColor = Color.White,
+                            cursorColor = Color.White
+                        )
+                    )
+
+                    OutlinedTextField(
+                        value = mensaje,
+                        onValueChange = { mensaje = it },
+                        label = { Text("Tu mensaje", color = Color.White) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp), // Más alto para mensajes largos
+                        singleLine = false,
+                        maxLines = 6,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedTextColor = Color.White,
+                            unfocusedTextColor = Color.White,
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White,
+                            cursorColor = Color.White,
+                            focusedLabelColor = Color.White,
+                            unfocusedLabelColor = Color.White
+                        )
+                    )
+
+                    Button(
+                        onClick = {
+                            if (mensaje.isNotBlank()) {
+                                viewModel.sendResponse(
+                                    ticketId = ticketId,
+                                    nombre = nombreUsuario,
+                                    mensaje = mensaje,
+                                    tipoUsuario = tipoUsuario
+                                )
+                                mensaje = ""
+                            }
+                        },
+                        modifier = Modifier.align(Alignment.End),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                    ) {
+                        Text("Enviar respuesta")
+                    }
                 }
             }
         }
