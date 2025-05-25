@@ -15,12 +15,14 @@ import edu.ucne.registro_tecnicos.presentation.ticket.TicketListScreen
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketScreen
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketViewModel
 import edu.ucne.registro_tecnicos.presentation.ticketresponse.TicketResponseScreen
+import edu.ucne.registro_tecnicos.presentation.ticketresponse.TicketResponseViewModel
 
 @Composable
 fun TecnicosNavHost(
     navHostController: NavHostController,
     tecnicoViewModel: TecnicosViewModel,
-    ticketViewModel: TicketViewModel
+    ticketViewModel: TicketViewModel,
+    ticketResponseViewModel: TicketResponseViewModel // <-- AGREGA ESTO
 ) {
     NavHost(
         navController = navHostController,
@@ -75,8 +77,6 @@ fun TecnicosNavHost(
             val tecnicoId = if (tecnicoIdParam == "null") null else tecnicoIdParam?.toIntOrNull()
             val tecnico = tecnicoViewModel.getTecnicoById(tecnicoId)
 
-
-
             TecnicoScreen(
                 tecnico = tecnico,
                 agregarTecnico = { nombre, sueldo ->
@@ -99,13 +99,11 @@ fun TecnicosNavHost(
             val ticket = ticketViewModel.getTicketById(ticketId)
             val tecnicos = tecnicoViewModel.tecnicoList.collectAsState().value
 
-
             val prioridades = listOf(
                 PrioridadEntity(1, "Baja"),
                 PrioridadEntity(2, "Media"),
                 PrioridadEntity(3, "Alta")
             )
-
 
             TicketScreen(
                 ticket = ticket,
@@ -130,22 +128,34 @@ fun TecnicosNavHost(
                 },
                 onCancel = { navHostController.popBackStack() }
             )
-
         }
+
         composable("TicketResponse/{ticketId}") { backStackEntry ->
-            val ticketId = backStackEntry.arguments?.getString("ticketId")?.toIntOrNull()
+            val ticketId = backStackEntry.arguments?.getString("ticketId")?.toIntOrNull() ?: -1
+
+            // Accede a los tickets y técnicos desde tus ViewModels
+            val ticket = ticketViewModel.getTicketById(ticketId)
+            val tecnicosList = tecnicoViewModel.tecnicoList.collectAsState().value
+
+            val getNombrePorTipo: (Int, String) -> String = { id, tipo ->
+                if (ticket != null) {
+                    if (tipo == "Usuario") {
+                        ticket.cliente // O el campo correcto
+                    } else {
+                        val tecnico = tecnicosList.find { it.tecnicosId == ticket.tecnicoId }
+                        tecnico?.nombre ?: "Operador"
+                    }
+                } else {
+                    ""
+                }
+            }
 
             TicketResponseScreen(
-                ticketId = ticketId ?: -1, // Maneja valores nulos
-                responses = emptyList(), // Reemplaza con tu fuente de datos real
-                nombreUsuario = "Usuario", // Ajusta según tu lógica
-                tipoUsuario = "Operador", // Ajusta según tu lógica
-                onMessageSend = { mensaje ->
-                    // Lógica para guardar el comentario
-                },
+                ticketId = ticketId,
+                viewModel = ticketResponseViewModel,
+                getNombrePorTipo = getNombrePorTipo,
                 onBack = { navHostController.popBackStack() }
             )
         }
-
     }
 }
