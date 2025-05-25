@@ -9,9 +9,11 @@ import androidx.room.Room
 import edu.ucne.registro_tecnicos.data.local.database.TecnicosDb
 import edu.ucne.registro_tecnicos.data.repository.TecnicosRepository
 import edu.ucne.registro_tecnicos.data.repository.TicketRepository
+import edu.ucne.registro_tecnicos.data.repository.TicketResponseRepository
 import edu.ucne.registro_tecnicos.data.repository.TecnicosNavHost
 import edu.ucne.registro_tecnicos.presentation.tecnicos.TecnicosViewModel
 import edu.ucne.registro_tecnicos.presentation.ticket.TicketViewModel
+import edu.ucne.registro_tecnicos.presentation.ticketresponse.TicketResponseViewModel
 import edu.ucne.registro_tecnicos.ui.theme.Registro_TecnicosTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,11 +24,13 @@ class MainActivity : ComponentActivity() {
     private lateinit var ticketRepository: TicketRepository
     private lateinit var ticketViewModel: TicketViewModel
 
+    private lateinit var ticketResponseRepository: TicketResponseRepository
+    private lateinit var ticketResponseViewModel: TicketResponseViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Inicialización de la base de datos
         tecnicoDb = Room.databaseBuilder(
             applicationContext,
             TecnicosDb::class.java,
@@ -34,12 +38,13 @@ class MainActivity : ComponentActivity() {
         ).fallbackToDestructiveMigration()
             .build()
 
-        // Repositorios y ViewModels
         tecnicosRepository = TecnicosRepository(tecnicoDb.tecnicosDao())
         tecnicosViewModel = TecnicosViewModel(tecnicosRepository)
 
         ticketRepository = TicketRepository(tecnicoDb)
-        ticketViewModel = TicketViewModel(ticketRepository)
+        ticketResponseRepository = TicketResponseRepository(tecnicoDb.ticketResponseDao())
+        ticketViewModel = TicketViewModel(ticketRepository, ticketResponseRepository)
+        ticketResponseViewModel = TicketResponseViewModel(ticketResponseRepository)
 
         setContent {
             Registro_TecnicosTheme {
@@ -47,7 +52,8 @@ class MainActivity : ComponentActivity() {
                 TecnicosNavHost(
                     navHostController = navController,
                     tecnicoViewModel = tecnicosViewModel,
-                    ticketViewModel = ticketViewModel
+                    ticketViewModel = ticketViewModel,
+                    ticketResponseViewModel = ticketResponseViewModel
                 )
             }
         }
