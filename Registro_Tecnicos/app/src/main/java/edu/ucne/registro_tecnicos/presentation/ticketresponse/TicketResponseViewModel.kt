@@ -3,16 +3,19 @@ package edu.ucne.registro_tecnicos.presentation.ticketresponse
 import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import edu.ucne.registro_tecnicos.data.local.entities.TicketResponseEntity
-import edu.ucne.registro_tecnicos.data.repository.TicketResponseRepository
+import edu.ucne.registro_tecnicos.data.local.repository.TicketResponseRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.*
+import javax.inject.Inject
 
-class TicketResponseViewModel(
+@HiltViewModel
+class TicketResponseViewModel @Inject constructor(
     private val repository: TicketResponseRepository
 ) : ViewModel() {
 

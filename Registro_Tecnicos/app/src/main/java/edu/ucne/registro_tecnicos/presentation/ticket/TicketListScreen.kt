@@ -61,7 +61,7 @@ fun TicketListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Gray)
+                .background(Color.White)
                 .padding(paddingValues)
                 .padding(horizontal = 18.dp, vertical = 18.dp)
         ) {
@@ -107,54 +107,65 @@ fun TicketRow(
     onEdit: (TicketsEntity) -> Unit,
     onComment: (TicketsEntity) -> Unit
 ) {
-    val prioridadTexto = when (ticket.prioridadId) {
-        1 -> "Baja"
-        2 -> "Media"
-        3 -> "Alta"
-        else -> "Desconocida"
-    }
-
     val tecnicoNombre = tecnicos.find { it.tecnicosId == ticket.tecnicoId }?.nombre ?: "Desconocido"
 
     Card(
-        elevation = CardDefaults.cardElevation(8.dp),
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F6FA)), // Gris claro
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                InfoRow(label = "Fecha:", value = ticket.fecha)
-                InfoRow(label = "Prioridad:", value = prioridadTexto)
-                InfoRow(label = "Cliente:", value = ticket.cliente)
-                InfoRow(label = "Asunto:", value = ticket.asunto)
-
-                // Descripción mejorada
-                Row(verticalAlignment = Alignment.Top) {
-                    Text("Descripción:", fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = ticket.descripcion.replace("\n", " "),
-                        modifier = Modifier.weight(1f),
-                        softWrap = true,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Ticket #: ${ticket.ticketId}",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 14.sp
                     )
-                }
-
-                InfoRow(label = "Técnico:", value = tecnicoNombre)
+                )
+                Text(
+                    text = "${ticket.fecha}",
+                    style = TextStyle(
+                        color = Color.Black,
+                        fontSize = 14.sp
+                    )
+                )
             }
-
-            ActionButtons(
-                onComment = { onComment(ticket) },
-                onEdit = { onEdit(ticket) },
-                onDelete = { onDelete(ticket) }
+            Spacer(modifier = Modifier.size(10.dp))
+            Text(
+                text = "Cliente: ${ticket.cliente}",
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
+                fontSize = 16.sp
             )
+            Text(
+                text = "Asunto: ${ticket.asunto}",
+                color = Color.Black,
+                fontSize = 15.sp
+            )
+            Spacer(modifier = Modifier.size(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { onComment(ticket) }) {
+                    Icon(Icons.Filled.ChatBubble, contentDescription = "Comentar", tint = Color(0xFF4CAF50))
+                }
+                IconButton(onClick = { onEdit(ticket) }) {
+                    Icon(Icons.Filled.Edit, contentDescription = "Editar", tint = Color(0xFF4CAF50))
+                }
+                IconButton(onClick = { onDelete(ticket) }) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar", tint = Color.Red)
+                }
+            }
         }
     }
 }

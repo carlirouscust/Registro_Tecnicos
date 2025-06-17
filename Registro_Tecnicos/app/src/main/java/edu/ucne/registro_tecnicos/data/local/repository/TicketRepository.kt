@@ -1,4 +1,4 @@
-package edu.ucne.registro_tecnicos.data.repository
+package edu.ucne.registro_tecnicos.data.local.repository
 
 import edu.ucne.registro_tecnicos.data.local.database.TecnicosDb
 import edu.ucne.registro_tecnicos.data.local.entities.TicketResponseEntity
@@ -6,7 +6,7 @@ import edu.ucne.registro_tecnicos.data.local.entities.TicketsEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class TicketRepository (private val tecnicoDb: TecnicosDb)
+class TicketRepository @Inject constructor (private val tecnicoDb: TecnicosDb)
 {
     suspend fun saveTicket(ticket: TicketsEntity){
         tecnicoDb.TicketDao().save(ticket)

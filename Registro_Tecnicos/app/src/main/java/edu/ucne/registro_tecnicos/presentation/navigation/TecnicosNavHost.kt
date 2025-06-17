@@ -7,6 +7,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.ucne.registro_tecnicos.data.local.entities.PrioridadEntity
+import edu.ucne.registro_tecnicos.presentation.curas.CurasListScreen
+import edu.ucne.registro_tecnicos.presentation.curas.CuraScreen
+import edu.ucne.registro_tecnicos.presentation.curas.CurasUiState
+import edu.ucne.registro_tecnicos.presentation.curas.CurasViewModel
 import edu.ucne.registro_tecnicos.presentation.tecnicos.TecnicoListScreen
 import edu.ucne.registro_tecnicos.presentation.tecnicos.TecnicoScreen
 import edu.ucne.registro_tecnicos.presentation.tecnicos.TecnicosViewModel
@@ -22,7 +26,8 @@ fun TecnicosNavHost(
     navHostController: NavHostController,
     tecnicoViewModel: TecnicosViewModel,
     ticketViewModel: TicketViewModel,
-    ticketResponseViewModel: TicketResponseViewModel // <-- AGREGA ESTO
+    ticketResponseViewModel: TicketResponseViewModel,
+    curasViewModel: CurasViewModel
 ) {
     NavHost(
         navController = navHostController,
@@ -35,11 +40,13 @@ fun TecnicosNavHost(
                 },
                 goToTicket = {
                     navHostController.navigate("TicketList")
+                },
+                goToCura = {
+                    navHostController.navigate("CurasList")
                 }
             )
         }
 
-        // Lista de técnicos
         composable("TecnicoList") {
             val tecnicoList = tecnicoViewModel.tecnicoList.collectAsState().value
 
@@ -57,21 +64,24 @@ fun TecnicosNavHost(
             )
         }
 
-        composable("TicketList") {
-            val ticketList = ticketViewModel.ticketList.collectAsState().value
-            val tecnicoList = tecnicoViewModel.tecnicoList.collectAsState().value
+        composable("CurasList") {
+            val state = curasViewModel.uiState.collectAsState().value
 
-            TicketListScreen(
-                navController = navHostController,
-                ticketList = ticketList,
-                tecnicos = tecnicoList,
-                onDelete = { ticket -> ticketViewModel.delete(ticket) },
-                onComment = { ticket -> navHostController.navigate("TicketResponse/${ticket.ticketId}")}
+
+            CurasListScreen(
+                state = state,
+                onEdit = { cura ->
+                    navHostController.navigate("Cura/${cura.curasId}")
+                },
+                onCreate = {
+                    navHostController.navigate("Cura/null")
+                },
+                onDelete = { cura ->
+                    cura.curasId?.let { curasViewModel.deleteCura(it) }
+                }
             )
         }
 
-
-        // Crear o editar técnico
         composable("Tecnico/{tecnicoId}") { backStackEntry ->
             val tecnicoIdParam = backStackEntry.arguments?.getString("tecnicoId")
             val tecnicoId = if (tecnicoIdParam == "null") null else tecnicoIdParam?.toIntOrNull()
@@ -90,6 +100,51 @@ fun TecnicosNavHost(
                 onCancel = {
                     navHostController.popBackStack()
                 }
+            )
+        }
+
+        composable("Cura/{curaId}") { backStackEntry ->
+            val curaIdParam = backStackEntry.arguments?.getString("curaId")
+            val curaId = if (curaIdParam == "null") null else curaIdParam?.toIntOrNull()
+            val cura = curasViewModel.getCuraById(curaId)
+            val state = if (curaId == null) CurasUiState()
+            else curasViewModel.uiState.collectAsState().value.copy(
+                curasId = cura?.curasId,
+                descripcion = cura?.descripcion ?: "",
+                monto = cura?.monto ?: 0
+            )
+
+            CuraScreen(
+                state = state,
+                agregarCura = { descripcion, monto ->
+                    if (cura == null) {
+                        curasViewModel.agregarCura(descripcion, monto)
+                    } else {
+                        curasViewModel.updateCura(
+                            cura.copy(
+                                descripcion = descripcion,
+                                monto = monto
+                            )
+                        )
+                    }
+                    navHostController.popBackStack()
+                },
+                onCancel = {
+                    navHostController.popBackStack()
+                }
+            )
+        }
+
+        composable("TicketList") {
+            val ticketList = ticketViewModel.ticketList.collectAsState().value
+            val tecnicoList = tecnicoViewModel.tecnicoList.collectAsState().value
+
+            TicketListScreen(
+                navController = navHostController,
+                ticketList = ticketList,
+                tecnicos = tecnicoList,
+                onDelete = { ticket -> ticketViewModel.delete(ticket) },
+                onComment = { ticket -> navHostController.navigate("TicketResponse/${ticket.ticketId}")}
             )
         }
 

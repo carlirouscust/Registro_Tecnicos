@@ -2,15 +2,18 @@ package edu.ucne.registro_tecnicos.presentation.ticket
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import edu.ucne.registro_tecnicos.data.local.entities.TicketsEntity
-import edu.ucne.registro_tecnicos.data.repository.TicketRepository
+import edu.ucne.registro_tecnicos.data.local.repository.TicketRepository
 import kotlinx.coroutines.flow.stateIn
-import edu.ucne.registro_tecnicos.data.repository.TicketResponseRepository
+import edu.ucne.registro_tecnicos.data.local.repository.TicketResponseRepository
+import javax.inject.Inject
 
-class TicketViewModel(
+@HiltViewModel
+class TicketViewModel @Inject constructor(
     private val repository: TicketRepository,
     private val ticketResponseRepository: TicketResponseRepository
 ) : ViewModel() {

@@ -1,4 +1,4 @@
-package edu.ucne.registro_tecnicos.data.repository
+package edu.ucne.registro_tecnicos.data.local.repository
 
 import edu.ucne.registro_tecnicos.data.local.dao.PrioridadDao
 import edu.ucne.registro_tecnicos.data.local.entities.PrioridadEntity

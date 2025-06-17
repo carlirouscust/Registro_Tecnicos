@@ -1,21 +1,21 @@
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Healing
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun Home(
     goToTecnico: () -> Unit,
     goToTicket: () -> Unit,
+    goToCura: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -59,14 +59,27 @@ fun Home(
                 ),
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp, end = 8.dp)
             ) {
                 Icon(Icons.Filled.MailOutline, contentDescription = "Tickets")
                 Spacer(modifier = Modifier.width(8.dp))
                 Text("Tickets")
             }
+
+            Button(
+                onClick = goToCura,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Green,
+                    contentColor = Color.Black
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
+            ) {
+                Icon(Icons.Filled.Healing, contentDescription = "Curas")
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Curas")
+            }
         }
     }
 }
-
-
